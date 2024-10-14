@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monaco Editor - HTML with Autocomplete and Light Theme</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        #editor {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    <!-- Đường dẫn đến Monaco Editor CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.min.js"></script>
+</head>
+<body>
+    <div id="editor"></div>
+
+    <script>
+        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' }});
+        require(['vs/editor/editor.main'], function() {
+            // Đăng ký một theme light tùy chỉnh
+            monaco.editor.defineTheme('myLightTheme', {
+                base: 'vs', // Dựa trên theme 'vs' (sáng)
+                inherit: true, // Kế thừa từ theme gốc
+                rules: [
+                    { token: 'comment', foreground: '008000', fontStyle: 'italic' },  // Màu xanh cho comment
+                    { token: 'keyword', foreground: '0000FF', fontStyle: 'bold' },   // Màu xanh dương cho từ khóa
+                    { token: 'attribute.name', foreground: 'FF4500' },               // Màu cam cho thuộc tính HTML
+                    { token: 'string', foreground: 'A31515' },                       // Màu đỏ nâu cho chuỗi
+                    { token: 'tag', foreground: '800000' },                          // Màu đỏ đậm cho thẻ HTML
+                    { token: 'variable', foreground: '1E90FF' },                     // Màu xanh da trời cho biến
+                ],
+                colors: {
+                    'editor.background': '#FFFFFF',  // Màu nền trắng
+                    'editor.foreground': '#000000',  // Màu chữ đen
+                    'editor.lineHighlightBackground': '#F3F3F3' // Màu nền cho dòng được highlight
+                }
+            });
+
+            // Tạo Monaco Editor với theme light tùy chỉnh
+            const editor = monaco.editor.create(document.getElementById('editor'), {
+                value: [
+                    '<!DOCTYPE html>',
+                    '<html lang="en">',
+                    '<head>',
+                    '\t<meta charset="UTF-8">',
+                    '\t<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+                    '\t<title>Document</title>',
+                    '</head>',
+                    '<body>',
+                    '\t<h1>Hello World</h1>',
+                    '</body>',
+                    '</html>'
+                ].join('\n'),
+                language: 'html',
+                theme: 'myLightTheme'  // Sử dụng theme light đã định nghĩa
+            });
+
+            // Định nghĩa gợi ý tùy chỉnh cho HTML
+            monaco.languages.registerCompletionItemProvider('html', {
+                provideCompletionItems: function(model, position) {
+                    const suggestions = [
+                        {
+                            label: 'html5-template',
+                            kind: monaco.languages.CompletionItemKind.Snippet,
+                            insertText: [
+                                '<!DOCTYPE html>',
+                                '<html lang="en">',
+                                '<head>',
+                                '\t<meta charset="UTF-8">',
+                                '\t<meta name="viewport" content="width=device-width, initial-scale=1.0">',
+                                '\t<title>Document</title>',
+                                '</head>',
+                                '<body>',
+                                '\t<!-- Nội dung của bạn -->',
+                                '</body>',
+                                '</html>'
+                            ].join('\n'),
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            documentation: 'HTML5 Basic Template'
+                        },
+                        {
+                            label: 'div',
+                            kind: monaco.languages.CompletionItemKind.Snippet,
+                            insertText: '<div>\n\t$0\n</div>',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            documentation: 'Thẻ div cơ bản'
+                        },
+                        {
+                            label: 'h1',
+                            kind: monaco.languages.CompletionItemKind.Snippet,
+                            insertText: '<h1>$0</h1>',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            documentation: 'Thẻ h1'
+                        },
+                        {
+                            label: 'link-css',
+                            kind: monaco.languages.CompletionItemKind.Snippet,
+                            insertText: '<link rel="stylesheet" href="$0">',
+                            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                            documentation: 'Liên kết đến file CSS'
+                        }
+                    ];
+                    return { suggestions: suggestions };
+                }
+            });
+        });
+    </script>
+</body>
+</html>
